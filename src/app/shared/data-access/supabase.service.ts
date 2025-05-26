@@ -1,12 +1,10 @@
-import { environment } from '../../../environments/environment'
-import {
-    createClient,
-    SupabaseClient,
-} from './../../../../node_modules/@supabase/supabase-js/src/index'
-import { Injectable } from '@angular/core'
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../../../environments/environment';
 
-// Al estar a nivel de root este servicio se comporta como un Singleton
-// Luego de haber creado una instancia siempre retorna dicha instancia ya creada.
+import { Injectable } from "@angular/core";
+
+// Al estar a nivel de root este servicio se comporta como un Singleton 
+// Luego de haber creado una instancia siempre retorna dicha instancia ya creada
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
     supabaseClient: SupabaseClient
