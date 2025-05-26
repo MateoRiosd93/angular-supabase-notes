@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-auth-log-in',
-  imports: [],
-  template: `
-    <p>
-      auth-log-in works!
-    </p>
-  `,
+  imports: [RouterLink],
+  templateUrl: './auth-log-in.component.html',
   styleUrl: './auth-log-in.component.css'
 })
 export default class AuthLogInComponent {
