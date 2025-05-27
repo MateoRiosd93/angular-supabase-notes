@@ -7,19 +7,21 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    private _supabaseClient = inject(SupabaseService).supabaseClient
+    private readonly supabaseClient = inject(SupabaseService).supabaseClient
 
-    session() {}
+    session() {
+        return this.supabaseClient.auth.getSession();
+    }
 
     signUp(credentials: SignUpWithPasswordCredentials) {
-        return this._supabaseClient.auth.signUp(credentials)
+        return this.supabaseClient.auth.signUp(credentials)
     }
 
     logIn(credentials: SignInWithPasswordCredentials) {
-        return this._supabaseClient.auth.signInWithPassword(credentials)
+        return this.supabaseClient.auth.signInWithPassword(credentials)
     }
 
     signOut() {
-        return this._supabaseClient.auth.signOut()
+        return this.supabaseClient.auth.signOut()
     }
 }
