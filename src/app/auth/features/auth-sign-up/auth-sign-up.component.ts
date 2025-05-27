@@ -15,8 +15,8 @@ interface SignUpForm {
     styleUrl: './auth-sign-up.component.css',
 })
 export default class AuthSignUpComponent {
-    private formBuilder = inject(FormBuilder)
-    private authService = inject(AuthService)
+    private readonly formBuilder = inject(FormBuilder)
+    private readonly authService = inject(AuthService)
 
     form = this.formBuilder.group<SignUpForm>({
         email: this.formBuilder.control(null, [Validators.required, Validators.email]),
@@ -26,11 +26,17 @@ export default class AuthSignUpComponent {
     async submit() {
         if (this.form.invalid) return
 
-        const authResponse = await this.authService.signUp({
-            email: this.form.value.email ?? '',
-            password: this.form.value.password ?? '',
-        })
+        try {
+            const authResponse = await this.authService.signUp({
+                email: this.form.value.email ?? '',
+                password: this.form.value.password ?? '',
+            })
 
-        console.log(authResponse)
+            if(authResponse.error) throw authResponse.error
+
+            alert('Recuerda confirmar tu correo! para iniciar session...')
+        } catch (error) {
+            console.error(error)
+        }
     }
 }
