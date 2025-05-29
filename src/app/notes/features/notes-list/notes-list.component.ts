@@ -4,6 +4,7 @@ import { Router } from '@angular/router'
 import { Note, NotesService } from '../../data-access/notes.service'
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { getUserIdLocalStorage } from '../../../shared/storage/local-storage'
+import { uuid } from '@supabase/supabase-js/src/lib/helpers'
 
 interface NoteForm {
     title: FormControl<string | null>
@@ -23,6 +24,9 @@ export default class NotesListComponent implements AfterViewInit {
 
     private readonly formBuilder = inject(FormBuilder)
 
+    isEditNote: boolean = false
+    idNoteForEdit: string = ''
+
     form = this.formBuilder.group<NoteForm>({
         title: this.formBuilder.control(null, [Validators.required]),
         description: this.formBuilder.control(null),
@@ -37,18 +41,37 @@ export default class NotesListComponent implements AfterViewInit {
         this.router.navigateByUrl('/auth/log-in')
     }
 
-    save(){
-        if(this.form.invalid) return
+    saveNote() {
+        if (this.form.invalid) return
 
         const newNote: Note = {
-            id: (this.notesService.notes().length + 1).toString(),
+            id: this.idNoteForEdit || uuid(),
             title: this.form.value.title as string,
             description: this.form.value.description as string,
-            user_id: getUserIdLocalStorage() as string 
+            user_id: getUserIdLocalStorage() as string,
+        }
+
+        this.form.reset()
+
+        if (this.isEditNote) {
+            this.notesService.editNote(newNote)
+            this.isEditNote = false
+            this.idNoteForEdit = ''
+            return
         }
 
         this.notesService.saveNote(newNote)
-
-        this.form.reset()
     }
+
+    loadNoteForEdit(note: Note) {
+        this.form.patchValue({
+            title: note.title,
+            description: note.description,
+        })
+
+        this.isEditNote = true
+        this.idNoteForEdit = note.id
+    }
+
+    deleteNote(id: string) {}
 }
