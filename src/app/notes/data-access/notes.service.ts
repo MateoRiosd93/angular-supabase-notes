@@ -1,9 +1,9 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { SupabaseService } from '../../shared/data-access/supabase.service'
 
-interface Note {
+export interface Note {
     id: string
-    title: string
+    title: string | null
     description: string | null
     user_id: string
 }
@@ -32,10 +32,80 @@ export class NotesService {
     async getAllNotes() {
         // try catch debido a q all lo que retorna supabase es una promise
         try {
-            const { data: notes, error } = await this.supabaseClient.from('notes').select()
+            this.state.update(state => ({
+                ...state,
+                loading: true,
+            }))
 
-            console.log(notes);
+            const { data: notes } = await this.supabaseClient
+                .from('notes')
+                .select()
+                .overrideTypes<Note[]>()
+
+            if (notes) {
+                this.state.update(state => ({
+                    ...state,
+                    notes,
+                }))
+            }
         } catch (error) {
+            this.state.update(state => ({
+                ...state,
+                error: true,
+            }))
+
+            console.error(error)
+        } finally {
+            this.state.update(state => ({
+                ...state,
+                loading: false,
+            }))
+        }
+    }
+
+    async saveNote(note: Note) {
+        try {
+            const { data, error } = await this.supabaseClient.from('notes').insert(note).select()
+
+            if (error) throw error
+
+            if (data) {
+                this.state.update(state => ({
+                    ...state,
+                    notes: [...state.notes, ...data],
+                }))
+            }
+        } catch (error) {
+            this.state.update(state => ({
+                ...state,
+                error: true,
+            }))
+
+            console.error(error)
+        }
+    }
+
+    async editNote(note: Note) {
+        try {
+            const { data, error } = await this.supabaseClient
+                .from('notes')
+                .update(note)
+                .eq('id', note.id)
+
+            if (error) throw error
+
+            if (data) {
+                this.state.update(state => ({
+                    ...state,
+                    notes: [...state.notes, ...data],
+                }))
+            }
+        } catch (error) {
+            this.state.update(state => ({
+                ...state,
+                error: true,
+            }))
+
             console.error(error)
         }
     }
