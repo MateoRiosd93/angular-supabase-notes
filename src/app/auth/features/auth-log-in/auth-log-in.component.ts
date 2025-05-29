@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core'
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import { AuthService } from '../../data-access/auth.service'
+import { setUserIdLocalStorage } from '../../../shared/storage/local-storage'
 
 interface LogInForm {
     email: FormControl<null | string>
@@ -28,12 +29,14 @@ export default class AuthLogInComponent {
         if (this.form.invalid) return
 
         try {
-            const { error } = await this.authService.logIn({
+            const { data: { user }, error } = await this.authService.logIn({
                 email: this.form.value.email ?? '',
                 password: this.form.value.password ?? '',
             })
 
             if (error) throw error
+
+            if (user) setUserIdLocalStorage(user.id)
 
             this.router.navigateByUrl('/')
         } catch (error) {
