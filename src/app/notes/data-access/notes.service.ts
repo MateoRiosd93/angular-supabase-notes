@@ -65,7 +65,10 @@ export class NotesService {
 
     async saveNote(note: Note) {
         try {
-            const { data, error } = await this.supabaseClient.from('notes').insert(note).select()
+            const { data, error } = await this.supabaseClient
+                .from('notes')
+                .insert(note)
+                .select()
 
             if (error) throw error
 
@@ -91,13 +94,21 @@ export class NotesService {
                 .from('notes')
                 .update(note)
                 .eq('id', note.id)
-
+                .select()
+            
             if (error) throw error
+
+            const notes = this.state().notes.map(element => {
+                if(element.id === note.id){
+                    return {...note}
+                }
+                return element
+            })
 
             if (data) {
                 this.state.update(state => ({
                     ...state,
-                    notes: [...state.notes, ...data],
+                    notes: [...notes],
                 }))
             }
         } catch (error) {
