@@ -8,7 +8,7 @@ import { uuid } from '@supabase/supabase-js/src/lib/helpers'
 import { FooterComponent } from '../../../shared/components/footer/footer.component'
 
 interface NoteForm {
-    title: FormControl<string | null>
+    title: FormControl<string>
     description: FormControl<string | null>
 }
 
