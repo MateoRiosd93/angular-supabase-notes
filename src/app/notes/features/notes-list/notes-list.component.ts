@@ -73,5 +73,7 @@ export default class NotesListComponent implements AfterViewInit {
         this.idNoteForEdit = note.id
     }
 
-    deleteNote(id: string) {}
+    deleteNote(id: string) {
+        this.notesService.deleteNote(id)
+    }
 }
