@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { SupabaseService } from '../../shared/data-access/supabase.service'
+import { getUserIdLocalStorage } from '../../shared/storage/local-storage'
 
 export interface Note {
     id: string
@@ -40,6 +41,7 @@ export class NotesService {
             const { data: notes } = await this.supabaseClient
                 .from('notes')
                 .select()
+                .eq('user_id', getUserIdLocalStorage())
                 .overrideTypes<Note[]>()
 
             if (notes) {
@@ -66,9 +68,9 @@ export class NotesService {
     async saveNote(note: Note) {
         try {
             const { data, error } = await this.supabaseClient
-                .from('notes')
-                .insert(note)
-                .select()
+            .from('notes')
+            .insert(note)
+            .select()
 
             if (error) throw error
 
@@ -95,12 +97,12 @@ export class NotesService {
                 .update(note)
                 .eq('id', note.id)
                 .select()
-            
+
             if (error) throw error
 
             const notes = this.state().notes.map(element => {
-                if(element.id === note.id){
-                    return {...note}
+                if (element.id === note.id) {
+                    return { ...note }
                 }
                 return element
             })
@@ -111,6 +113,31 @@ export class NotesService {
                     notes: [...notes],
                 }))
             }
+        } catch (error) {
+            this.state.update(state => ({
+                ...state,
+                error: true,
+            }))
+
+            console.error(error)
+        }
+    }
+
+    async deleteNote(id: string) {
+        try {
+            const { error } = await this.supabaseClient
+            .from('notes')
+            .delete()
+            .eq('id', id)
+
+            if (error) throw error
+
+            const newNotes = this.state().notes.filter(element => element.id !== id)
+
+            this.state.update(state => ({
+                ...state,
+                notes: [...newNotes],
+            }))
         } catch (error) {
             this.state.update(state => ({
                 ...state,
