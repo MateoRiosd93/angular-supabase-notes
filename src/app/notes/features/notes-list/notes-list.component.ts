@@ -29,7 +29,7 @@ export default class NotesListComponent implements AfterViewInit {
     idNoteForEdit: string = ''
 
     form = this.formBuilder.group<NoteForm>({
-        title: this.formBuilder.control(null, [Validators.required]),
+        title: this.formBuilder.control('', { nonNullable: true, validators: [Validators.required]}),
         description: this.formBuilder.control(null),
     })
 
@@ -66,7 +66,7 @@ export default class NotesListComponent implements AfterViewInit {
 
     loadNoteForEdit(note: Note) {
         this.form.patchValue({
-            title: note.title,
+            title: note.title ?? '',
             description: note.description,
         })
 

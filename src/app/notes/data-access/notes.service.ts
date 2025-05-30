@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { SupabaseService } from '../../shared/data-access/supabase.service'
 import { getUserIdLocalStorage } from '../../shared/storage/local-storage'
+import { ID, Tables, USER_ID } from '../../shared/utils/constants'
 
 export interface Note {
     id: string
@@ -39,9 +40,9 @@ export class NotesService {
             }))
 
             const { data: notes } = await this.supabaseClient
-                .from('notes')
+                .from(Tables.NOTES)
                 .select()
-                .eq('user_id', getUserIdLocalStorage())
+                .eq(USER_ID, getUserIdLocalStorage())
                 .overrideTypes<Note[]>()
 
             if (notes) {
@@ -68,7 +69,7 @@ export class NotesService {
     async saveNote(note: Note) {
         try {
             const { data, error } = await this.supabaseClient
-            .from('notes')
+            .from(Tables.NOTES)
             .insert(note)
             .select()
 
@@ -93,9 +94,9 @@ export class NotesService {
     async editNote(note: Note) {
         try {
             const { data, error } = await this.supabaseClient
-                .from('notes')
+                .from(Tables.NOTES)
                 .update(note)
-                .eq('id', note.id)
+                .eq(ID, note.id)
                 .select()
 
             if (error) throw error
@@ -126,9 +127,9 @@ export class NotesService {
     async deleteNote(id: string) {
         try {
             const { error } = await this.supabaseClient
-            .from('notes')
+            .from(Tables.NOTES)
             .delete()
-            .eq('id', id)
+            .eq(ID, id)
 
             if (error) throw error
 
