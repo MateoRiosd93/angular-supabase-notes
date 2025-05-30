@@ -5,6 +5,7 @@ import { Note, NotesService } from '../../data-access/notes.service'
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { getUserIdLocalStorage } from '../../../shared/storage/local-storage'
 import { uuid } from '@supabase/supabase-js/src/lib/helpers'
+import { FooterComponent } from '../../../shared/components/footer/footer.component'
 
 interface NoteForm {
     title: FormControl<string | null>
@@ -13,7 +14,7 @@ interface NoteForm {
 
 @Component({
     selector: 'app-notes-list',
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, FooterComponent],
     templateUrl: './notes-list.component.html',
     styleUrl: './notes-list.component.css',
 })
